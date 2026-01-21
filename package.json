@@ -4,7 +4,11 @@
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy --minify",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"build": "pnpm --filter client build",
+		"dev:client": "pnpm --filter client dev",
+		"lint:client": "pnpm --filter client lint",
+		"preview:client": "pnpm --filter client preview"
 	},
 	"dependencies": {
 		"@cloudflare/pages-plugin-vercel-og": "^0.1.2",

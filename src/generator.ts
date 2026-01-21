@@ -37,7 +37,7 @@ export function calculateNepaliYearProgress(currentNepaliDate: NepaliDate) {
 }
 
 // Lock screen safe zones (percentage of height)
-const TOP_PADDING_PERCENT = 22; // Space for clock + date
+const TOP_PADDING_PERCENT = 25; // Space for clock + date
 const BOTTOM_PADDING_PERCENT = 12; // Space for action buttons + home indicator
 
 export function generateDotsGridJSON(
@@ -97,7 +97,7 @@ export function generateDotsGridJSON(
     });
   }
 
-  const gridWidth = cols * cellSize;
+  const gridWidth = cols * cellSize + cellSize;
 
   // Calculate percentage
   const progressPercent = Math.round((currentDay / totalDays) * 100);
