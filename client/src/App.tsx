@@ -8,8 +8,6 @@ type Platform = "ios" | "android";
 type Step = "platform" | "setup";
 
 export function App() {
-  const previewUrl = `/api/year-progress?width=1179&height=2556`;
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState<Step>("platform");
   const [platform, setPlatform] = useState<Platform | null>(null);
@@ -38,7 +36,7 @@ export function App() {
         <CalendarRange className="size-14" />
       </div>
 
-      <MainCard previewUrl={previewUrl} onOpenSetup={handleOpenSetup} />
+      <MainCard onOpenSetup={handleOpenSetup} />
       <SetupDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
