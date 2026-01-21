@@ -1,5 +1,10 @@
 import { useState, useMemo } from "react";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  Copy,
+  CopyCheck,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Command,
@@ -244,7 +249,7 @@ export function DeviceSetup({
                 <span className="text-muted-foreground text-sm shrink-0">
                   {platform === "ios" ? "3.1" : "4.1"}
                 </span>
-                <div className="text-sm space-y-2 wrap-break-word">
+                <div className="text-sm space-y-2 wrap-break-word flex-1 w-full">
                   <p>
                     <span className="font-medium">
                       {platform === "ios"
@@ -275,8 +280,12 @@ export function DeviceSetup({
                     </ul>
                   )}
                   {selectedDevice && (
-                    <div className="flex gap-2 mt-2">
-                      <code className="flex-1 min-w-0 bg-background border px-3 py-2 text-xs font-mono truncate rounded">
+                    <div className="flex gap-2 mt-2 pr-6">
+                      {/* <code className="flex-1 min-w-0 bg-background border px-3 py-2 text-xs font-mono truncate rounded">
+                        {wallpaperUrl}
+                      </code> */}
+                      <code className="flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border">
+                        {wallpaperUrl}
                         {wallpaperUrl}
                       </code>
                       <Button
@@ -285,28 +294,7 @@ export function DeviceSetup({
                         onClick={handleCopyUrl}
                         className="shrink-0"
                       >
-                        {copied ? (
-                          <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <rect width="14" height="14" x="8" y="8" rx="2" />
-                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                          </svg>
-                        )}
+                        {copied ? <CopyCheck /> : <Copy />}
                       </Button>
                     </div>
                   )}
