@@ -17,7 +17,14 @@ export function Footer() {
         </p>
         <p className="flex items-center gap-1.5">
           Made in Nepal 🇳🇵 by{" "}
-          <span className="text-foreground font-semibold">bimsina</span>
+          <a
+            href="https://bibek-timsina.com.np"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-foreground font-semibold hover:underline underline-offset-4 transition-colors"
+          >
+            bimsina
+          </a>
         </p>
       </div>
 
