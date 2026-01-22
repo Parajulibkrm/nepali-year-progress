@@ -1,10 +1,5 @@
 import { useState, useMemo } from "react";
-import {
-  CheckIcon,
-  ChevronsUpDownIcon,
-  Copy,
-  CopyCheck,
-} from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, Copy, CopyCheck } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Command,
@@ -18,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 
 type Platform = "ios" | "android";
+type WallpaperType = "days" | "months";
 
 interface Device {
   value: string;
@@ -30,6 +26,7 @@ interface Device {
 interface DeviceSetupProps {
   platform: Platform;
   devices: Device[];
+  wallpaperType: WallpaperType;
   onBack: () => void;
   onClose: () => void;
 }
@@ -37,6 +34,7 @@ interface DeviceSetupProps {
 export function DeviceSetup({
   platform,
   devices,
+  wallpaperType,
   onBack,
   onClose,
 }: DeviceSetupProps) {
@@ -60,8 +58,9 @@ export function DeviceSetup({
 
   const wallpaperUrl = useMemo(() => {
     if (!selectedDeviceDetails) return "";
-    return `${window.location.origin}/api/year-progress?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
-  }, [selectedDeviceDetails]);
+    const endpoint = wallpaperType === "days" ? "days" : "months";
+    return `${window.location.origin}/api/year-progress/${endpoint}?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
+  }, [selectedDeviceDetails, wallpaperType]);
 
   const handleCopyUrl = async () => {
     try {
@@ -149,14 +148,18 @@ export function DeviceSetup({
           </div>
         </div>
 
-        {platform === "android" && (
-          <div className="space-y-3 overflow-x-hidden">
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0 rounded">
-                2
-              </div>
-              <h3 className="font-semibold">Install MacroDroid</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0 rounded">
+              2
             </div>
+            <h3 className="font-semibold">
+              {platform === "android"
+                ? "Install MacroDroid"
+                : "Create Automation"}
+            </h3>
+          </div>
+          {platform === "android" ? (
             <div className="ml-10 bg-muted p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 Install{" "}
@@ -171,20 +174,8 @@ export function DeviceSetup({
                 from Google Play Store.
               </p>
             </div>
-          </div>
-        )}
-
-        <div className="space-y-3 overflow-x-hidden">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0 rounded">
-              {platform === "ios" ? "2" : "3"}
-            </div>
-            <h3 className="font-semibold">
-              {platform === "ios" ? "Create Automation" : "Setup Macro"}
-            </h3>
-          </div>
-          <div className="ml-10 bg-muted p-4 rounded-lg">
-            {platform === "ios" ? (
+          ) : (
+            <div className="ml-10 bg-muted p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
                 Open{" "}
                 <a
@@ -209,7 +200,21 @@ export function DeviceSetup({
                   "Create New Shortcut"
                 </span>
               </p>
-            ) : (
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3 overflow-x-hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0 rounded">
+              3
+            </div>
+            <h3 className="font-semibold">
+              {platform === "android" ? "Setup Macro" : "Create Shortcut"}
+            </h3>
+          </div>
+          <div className="ml-10 bg-muted p-4 rounded-lg">
+            {platform === "android" ? (
               <p className="text-sm text-muted-foreground">
                 Open{" "}
                 <span className="text-foreground font-medium">MacroDroid</span>{" "}
@@ -226,6 +231,11 @@ export function DeviceSetup({
                   all weekdays
                 </span>
               </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Follow the standard shortcut creation steps to create a shortcut
+                that runs the actions below.
+              </p>
             )}
           </div>
         </div>
@@ -233,10 +243,12 @@ export function DeviceSetup({
         <div className="space-y-3 overflow-x-hidden">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0 rounded">
-              {platform === "ios" ? "3" : "4"}
+              4
             </div>
             <h3 className="font-semibold">
-              {platform === "ios" ? "Create Shortcut" : "Configure Actions"}
+              {platform === "android"
+                ? "Configure Actions"
+                : "Shortcut Actions"}
             </h3>
           </div>
           <div className="ml-10 bg-muted p-4 rounded-lg space-y-4 overflow-x-hidden">
@@ -247,7 +259,7 @@ export function DeviceSetup({
             <div className="space-y-2">
               <div className="flex gap-2">
                 <span className="text-muted-foreground text-sm shrink-0">
-                  {platform === "ios" ? "3.1" : "4.1"}
+                  {platform === "android" ? "4.1" : "3.1"}
                 </span>
                 <div className="text-sm space-y-2 wrap-break-word flex-1 w-full">
                   <p>
@@ -281,11 +293,7 @@ export function DeviceSetup({
                   )}
                   {selectedDevice && (
                     <div className="flex gap-2 mt-2 pr-6">
-                      {/* <code className="flex-1 min-w-0 bg-background border px-3 py-2 text-xs font-mono truncate rounded">
-                        {wallpaperUrl}
-                      </code> */}
-                      <code className="flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border">
-                        {wallpaperUrl}
+                      <code className="flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border text-xs">
                         {wallpaperUrl}
                       </code>
                       <Button
@@ -294,7 +302,11 @@ export function DeviceSetup({
                         onClick={handleCopyUrl}
                         className="shrink-0"
                       >
-                        {copied ? <CopyCheck /> : <Copy />}
+                        {copied ? (
+                          <CopyCheck className="size-4" />
+                        ) : (
+                          <Copy className="size-4" />
+                        )}
                       </Button>
                     </div>
                   )}
@@ -303,28 +315,6 @@ export function DeviceSetup({
                       Select a device above to generate the URL
                     </p>
                   )}
-                  {platform === "android" && (
-                    <ul className="text-muted-foreground space-y-1 list-disc list-inside text-sm mt-2">
-                      <li>
-                        Enable:{" "}
-                        <span className="text-foreground font-medium">
-                          Block next actions until complete
-                        </span>
-                      </li>
-                      <li>
-                        Response: Tick{" "}
-                        <span className="text-foreground font-medium">
-                          Save HTTP response to file
-                        </span>
-                      </li>
-                      <li>
-                        Folder & filename:{" "}
-                        <code className="inline-block bg-background px-1 py-0.5 text-foreground text-xs rounded break-all">
-                          /Download/nepali-year.png
-                        </code>
-                      </li>
-                    </ul>
-                  )}
                 </div>
               </div>
             </div>
@@ -332,7 +322,7 @@ export function DeviceSetup({
             <div className="space-y-2">
               <div className="flex gap-2">
                 <span className="text-muted-foreground text-sm shrink-0">
-                  {platform === "ios" ? "3.2" : "4.2"}
+                  {platform === "android" ? "4.2" : "3.2"}
                 </span>
                 <div className="text-sm">
                   <p className="font-medium">
@@ -355,18 +345,6 @@ export function DeviceSetup({
                         <span className="text-foreground font-medium">
                           Set Wallpaper
                         </span>
-                      </li>
-                      <li>
-                        Choose{" "}
-                        <span className="text-foreground font-medium">
-                          Image and Screen
-                        </span>
-                      </li>
-                      <li>
-                        Enter folder & filename:{" "}
-                        <code className="inline-block bg-background px-1 py-0.5 text-foreground text-xs rounded break-all">
-                          /Download/nepali-year.png
-                        </code>
                       </li>
                     </ul>
                   )}

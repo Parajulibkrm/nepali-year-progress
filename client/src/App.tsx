@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { devices } from "./devices";
-import { MainCard } from "./components/home";
+import { MainCard, Footer, Header } from "./components/home";
 import SetupDialog from "./components/setup";
-import { CalendarRange } from "lucide-react";
+import { DevTestView } from "./components/dev/DevTestView";
 
 type Platform = "ios" | "android";
 type Step = "platform" | "setup";
+type WallpaperType = "days" | "months";
 
 export function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState<Step>("platform");
   const [platform, setPlatform] = useState<Platform | null>(null);
+  const [wallpaperType, setWallpaperType] = useState<WallpaperType>("days");
 
-  const handleOpenSetup = () => {
+  const handleOpenSetup = (type: WallpaperType) => {
+    setWallpaperType(type);
     setDialogOpen(true);
     setStep("platform");
     setPlatform(null);
@@ -32,20 +35,22 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 flex-col gap-4">
-      <div className="p-4 rounded-lg bg-[#DC143C] text-white">
-        <CalendarRange className="size-14" />
-      </div>
+      <Header />
 
       <MainCard onOpenSetup={handleOpenSetup} />
+      <Footer />
       <SetupDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         step={step}
         platform={platform}
+        wallpaperType={wallpaperType}
         devices={devices}
         onSelectPlatform={handleSelectPlatform}
         onBack={handleBack}
       />
+
+      {import.meta.env.DEV && <DevTestView />}
     </div>
   );
 }
