@@ -19,20 +19,9 @@ Inspired by [thelifecalendar.com](https://www.thelifecalendar.com).
 
 ## Tech Stack
 
-### Backend (API & Image Generation)
-
 - **[Hono](https://hono.dev/)**: Lightweight web framework for Cloudflare Workers.
 - **[@cloudflare/pages-plugin-vercel-og](https://developers.cloudflare.com/pages/functions/plugins/vercel-og/)**: For dynamic image generation at the edge.
 - **[Cloudflare Workers](https://workers.cloudflare.com/)**: Serverless execution at the edge.
-- **TypeScript**: For type-safe development.
-
-### Frontend
-
-- **[React 19](https://react.dev/)**: Latest React features.
-- **[Vite](https://vitejs.dev/)**: Fast development environment.
-- **[Tailwind CSS v4](https://tailwindcss.com/)**: Modern styling.
-- **[Shadcn UI](https://ui.shadcn.com/)**: Beautifully designed accessible components.
-- **[Lucide React](https://lucide.dev/)**: Clean and consistent iconography.
 
 ## Getting Started
 
