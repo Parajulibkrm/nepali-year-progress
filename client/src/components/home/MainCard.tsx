@@ -17,64 +17,58 @@ interface MainCardProps {
   onOpenSetup: (type: WallpaperType) => void;
 }
 
+const items: {
+  title: string;
+  description: string;
+  image: string;
+  type: WallpaperType;
+  icon: React.ReactNode;
+}[] = [
+  {
+    title: "Days Grid",
+    description: "A minimal grid of dots representing each day of the year.",
+    image: days,
+    type: "days",
+    icon: <Calendar className="size-5 text-primary" />,
+  },
+  {
+    title: "Months Grid",
+    description: "A grid of months, showing progress within each month.",
+    image: months,
+    type: "months",
+    icon: <LayoutGrid className="size-5 text-primary" />,
+  },
+];
 export function MainCard({ onOpenSetup }: MainCardProps) {
   return (
     <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl px-4">
-      <Card className="flex-1 flex flex-col">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="size-5 text-primary" />
-            Days Grid
-          </CardTitle>
-          <CardDescription>
-            A minimal grid of dots representing each day of the year.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center min-h-[300px] bg-muted/30 rounded-md mt-0 overflow-hidden">
-          <img
-            src={days}
-            alt="Days Progress Preview"
-            className="object-scale-down h-[400px] hover:scale-105 transition-transform duration-500"
-          />
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={() => onOpenSetup("days")}
-            className="w-full"
-            variant={"outline"}
-          >
-            Setup Days Grid
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <Card className="flex-1 flex flex-col">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <LayoutGrid className="size-5 text-primary" />
-            Months Grid
-          </CardTitle>
-          <CardDescription>
-            A grid of months, showing progress within each month.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center min-h-[300px] bg-muted/30 rounded-md mt-0 overflow-hidden">
-          <img
-            src={months}
-            alt="Months Progress Preview"
-            className="object-scale-down h-[400px] hover:scale-105 transition-transform duration-500"
-          />
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={() => onOpenSetup("months")}
-            className="w-full"
-            variant="outline"
-          >
-            Setup Months Grid
-          </Button>
-        </CardFooter>
-      </Card>
+      {items.map((item) => (
+        <Card className="flex-1 flex flex-col" key={item.type}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {item.icon}
+              {item.title}
+            </CardTitle>
+            <CardDescription>{item.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 flex items-center justify-center bg-muted/30 rounded-md mt-0 overflow-hidden">
+            <img
+              src={item.image}
+              alt={`${item.title} Preview`}
+              className="object-scale-down h-[400px] hover:scale-105 transition-transform duration-500"
+            />
+          </CardContent>
+          <CardFooter>
+            <Button
+              onClick={() => onOpenSetup(item.type)}
+              className="w-full"
+              variant={"outline"}
+            >
+              Setup {item.title}
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 }

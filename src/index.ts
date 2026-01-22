@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { z } from "zod/v4/mini";
 import { ImageResponse } from "@cloudflare/pages-plugin-vercel-og/api";
-import { englishToNepali, formatNepaliDate } from "./date_helper";
+import {
+  englishToNepali,
+  formatNepaliDate,
+  type NepaliDate,
+} from "./date_helper";
 import {
   calculateNepaliYearProgress,
   generateDotsGridJSON,
@@ -14,6 +18,24 @@ const schema = z.object({
   width: z.coerce.number(),
   height: z.coerce.number(),
 });
+
+// Cache for 1 day (86400 seconds)
+const CACHE_MAX_AGE = 86400;
+
+function getCacheHeaders(
+  nepaliDate: NepaliDate,
+  width: number,
+  height: number,
+) {
+  // ETag based on Nepali date and dimensions - changes when date changes
+  const etag = `"${nepaliDate.year}-${nepaliDate.month}-${nepaliDate.day}-${width}x${height}"`;
+
+  return {
+    "Cache-Control": `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
+    "CDN-Cache-Control": `public, max-age=${CACHE_MAX_AGE}`,
+    ETag: etag,
+  };
+}
 
 app.get("/api/year-progress/days", async (c) => {
   try {
@@ -34,7 +56,7 @@ app.get("/api/year-progress/days", async (c) => {
     const progress = calculateNepaliYearProgress(nepaliDate);
     const dotsGridResult = generateDotsGridJSON(progress, width, height);
 
-    return new ImageResponse(
+    const imageResponse = new ImageResponse(
       {
         type: "div",
         props: {
@@ -56,6 +78,13 @@ app.get("/api/year-progress/days", async (c) => {
         height,
       },
     );
+
+    const cacheHeaders = getCacheHeaders(nepaliDate, width, height);
+    Object.entries(cacheHeaders).forEach(([key, value]) => {
+      imageResponse.headers.set(key, value);
+    });
+
+    return imageResponse;
   } catch (error) {
     console.error("Image generation error:", error);
     return c.json({ error: "Failed to generate image" }, 500);
@@ -86,7 +115,7 @@ app.get("/api/year-progress/months", async (c) => {
       height,
     );
 
-    return new ImageResponse(
+    const imageResponse = new ImageResponse(
       {
         type: "div",
         props: {
@@ -108,6 +137,13 @@ app.get("/api/year-progress/months", async (c) => {
         height,
       },
     );
+
+    const cacheHeaders = getCacheHeaders(nepaliDate, width, height);
+    Object.entries(cacheHeaders).forEach(([key, value]) => {
+      imageResponse.headers.set(key, value);
+    });
+
+    return imageResponse;
   } catch (error) {
     console.error("Image generation error:", error);
     return c.json({ error: "Failed to generate image" }, 500);
