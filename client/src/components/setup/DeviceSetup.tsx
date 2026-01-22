@@ -66,7 +66,7 @@ export function DeviceSetup({
 
   const handleCopyUrl = async () => {
     try {
-      copy("Text");
+      copy(wallpaperUrl);
       setCopied(true);
       toast.success("URL copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
