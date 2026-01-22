@@ -3,6 +3,7 @@ import { devices } from "./devices";
 import { MainCard, Footer, Header } from "./components/home";
 import SetupDialog from "./components/setup";
 import { DevTestView } from "./components/dev/DevTestView";
+import { Toaster } from "./components/ui/sonner";
 
 type Platform = "ios" | "android";
 type Step = "platform" | "setup";
@@ -49,6 +50,8 @@ export function App() {
         onSelectPlatform={handleSelectPlatform}
         onBack={handleBack}
       />
+
+      <Toaster />
 
       {import.meta.env.DEV && <DevTestView />}
     </div>

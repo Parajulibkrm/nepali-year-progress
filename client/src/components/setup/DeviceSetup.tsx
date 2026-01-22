@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { CheckIcon, ChevronsUpDownIcon, Copy, CopyCheck } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import {
   Command,
@@ -11,6 +12,7 @@ import {
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import copy from "copy-to-clipboard";
 
 type Platform = "ios" | "android";
 type WallpaperType = "days" | "months";
@@ -64,11 +66,15 @@ export function DeviceSetup({
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(wallpaperUrl);
+      copy("Text");
       setCopied(true);
+      toast.success("URL copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
+      toast.error("Failed to copy URL", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
     }
   };
 
@@ -94,7 +100,11 @@ export function DeviceSetup({
             <h3 className="font-semibold">Select Your Device</h3>
           </div>
           <div className="ml-10 space-y-3">
-            <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+            <Popover
+              open={comboboxOpen}
+              onOpenChange={setComboboxOpen}
+              modal={true}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -293,14 +303,13 @@ export function DeviceSetup({
                   )}
                   {selectedDevice && (
                     <div className="flex gap-2 mt-2 pr-6">
-                      <code className="flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border text-xs">
+                      <code className="flex flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border text-xs items-center">
                         {wallpaperUrl}
                       </code>
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={handleCopyUrl}
-                        className="shrink-0"
                       >
                         {copied ? (
                           <CopyCheck className="size-4" />
