@@ -61,7 +61,7 @@ export function DeviceSetup({
   const wallpaperUrl = useMemo(() => {
     if (!selectedDeviceDetails) return "";
     const endpoint = wallpaperType === "days" ? "days" : "months";
-    return `${window.location.origin}/api/year-progress/${endpoint}?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
+    return `${window.location.origin}/api/${endpoint}?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
   }, [selectedDeviceDetails, wallpaperType]);
 
   const handleCopyUrl = async () => {

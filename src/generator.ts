@@ -2,6 +2,7 @@ import {
   getDaysInMonth,
   getDaysInYear,
   formatNepaliDate,
+  getNepaliDayOfWeek,
   type NepaliDate,
   NEPALI_MONTHS,
 } from "./date_helper";
@@ -237,8 +238,33 @@ export function generateMonthsGridJSON(
     const daysInThisMonth = getDaysInMonth(currentNepaliDate.year, m);
     const monthDots = [];
 
-    for (let d = 1; d <= dayCols * dayRows; d++) {
-      const isInMonth = d <= daysInThisMonth;
+    // Get the day of week for the first day of this month (0=Sunday, 1=Monday, etc.)
+    const firstDayOfMonth: NepaliDate = {
+      year: currentNepaliDate.year,
+      month: m,
+      day: 1,
+    };
+    const startingDayOfWeek = getNepaliDayOfWeek(firstDayOfMonth);
+
+    // Create empty cells for days before the first day of month
+    for (let emptyDay = 0; emptyDay < startingDayOfWeek; emptyDay++) {
+      monthDots.push({
+        type: "div",
+        props: {
+          style: {
+            width: `${dotSize}px`,
+            height: `${dotSize}px`,
+            backgroundColor: "transparent",
+            borderRadius: "50%",
+            margin: `${gap / 2}px`,
+            opacity: 0,
+          },
+        },
+      });
+    }
+
+    // Create dots for actual days in the month
+    for (let d = 1; d <= daysInThisMonth; d++) {
       let isPassed = false;
       let isCurrent = false;
 
@@ -261,7 +287,26 @@ export function generateMonthsGridJSON(
             backgroundColor: isCurrent ? "red" : "white",
             borderRadius: "50%",
             margin: `${gap / 2}px`,
-            opacity: !isInMonth ? 0 : isPassed || isCurrent ? 1 : 0.2,
+            opacity: isPassed || isCurrent ? 1 : 0.2,
+          },
+        },
+      });
+    }
+
+    // Fill remaining cells if needed to complete the grid
+    const totalCellsUsed = startingDayOfWeek + daysInThisMonth;
+    const totalCells = dayCols * dayRows;
+    for (let fillDay = totalCellsUsed; fillDay < totalCells; fillDay++) {
+      monthDots.push({
+        type: "div",
+        props: {
+          style: {
+            width: `${dotSize}px`,
+            height: `${dotSize}px`,
+            backgroundColor: "transparent",
+            borderRadius: "50%",
+            margin: `${gap / 2}px`,
+            opacity: 0,
           },
         },
       });

@@ -33,7 +33,7 @@ function getCacheHeaders(
   };
 }
 
-app.get("/api/year-progress/days", async (c) => {
+app.get("/api/days", async (c) => {
   try {
     const queryData = c.req.query();
     const validatedData = schema.safeParse(queryData);
@@ -92,7 +92,7 @@ app.get("/api/year-progress/days", async (c) => {
   }
 });
 
-app.get("/api/year-progress/months", async (c) => {
+app.get("/api/months", async (c) => {
   try {
     const queryData = c.req.query();
     const validatedData = schema.safeParse(queryData);
@@ -150,7 +150,5 @@ app.get("/api/year-progress/months", async (c) => {
     return c.json({ error: "Failed to generate image" }, 500);
   }
 });
-
-app.get("/api/year-progress", (c) => c.redirect("/api/year-progress/days"));
 
 export default app;

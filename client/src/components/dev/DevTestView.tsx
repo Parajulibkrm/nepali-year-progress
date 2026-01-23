@@ -36,13 +36,13 @@ export function DevTestView() {
                 </CardHeader>
                 <CardContent className="p-4 bg-muted/20">
                   <img
-                    src={`${SERVER_URL}/api/year-progress/days?width=${device.width}&height=${device.height}`}
+                    src={`${SERVER_URL}/api/days?width=${device.width}&height=${device.height}`}
                     alt={`${device.label} Days`}
                     className="w-full h-auto aspect-[9/19.5] object-contain bg-black rounded shadow-lg border"
                     loading="lazy"
                   />
                   <div className="mt-2 text-[10px] text-muted-foreground break-all font-mono">
-                    {`${SERVER_URL}/api/year-progress/days?width=${device.width}&height=${device.height}`}
+                    {`${SERVER_URL}/api/days?width=${device.width}&height=${device.height}`}
                   </div>
                 </CardContent>
               </Card>
@@ -56,13 +56,13 @@ export function DevTestView() {
                 </CardHeader>
                 <CardContent className="p-4 bg-muted/20">
                   <img
-                    src={`${SERVER_URL}/api/year-progress/months?width=${device.width}&height=${device.height}`}
+                    src={`${SERVER_URL}/api/months?width=${device.width}&height=${device.height}`}
                     alt={`${device.label} Months`}
                     className="w-full h-auto aspect-[9/19.5] object-contain bg-black rounded shadow-lg border"
                     loading="lazy"
                   />
                   <div className="mt-2 text-[10px] text-muted-foreground break-all font-mono">
-                    {`${SERVER_URL}/api/year-progress/months?width=${device.width}&height=${device.height}`}
+                    {`${SERVER_URL}/api/months?width=${device.width}&height=${device.height}`}
                   </div>
                 </CardContent>
               </Card>

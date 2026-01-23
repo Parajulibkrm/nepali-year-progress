@@ -719,6 +719,11 @@ export function getNepaliDayName(nepaliDate: NepaliDate): string {
   return NEPALI_DAYS[dayIndex];
 }
 
+export function getNepaliDayOfWeek(nepaliDate: NepaliDate): number {
+  const englishDate = nepaliToEnglish(nepaliDate);
+  return englishDate.getDay();
+}
+
 export function addDays(nepaliDate: NepaliDate, days: number): NepaliDate {
   const englishDate = nepaliToEnglish(nepaliDate);
   englishDate.setDate(englishDate.getDate() + days);
