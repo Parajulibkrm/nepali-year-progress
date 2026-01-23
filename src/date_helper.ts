@@ -20,7 +20,7 @@ type NepaliYearData = {
 
 export type NepaliDate = {
   year: number;
-  month: number; // 1-12 (Baisakh = 1)
+  month: number;
   day: number;
 };
 
@@ -577,12 +577,10 @@ export const NEPALI_CALENDAR_DATA: NepaliYearData = {
 };
 
 export function englishToNepali(englishDate: Date): NepaliDate {
-  // Find the appropriate Nepali year
   for (const nepaliYearStr of Object.keys(NEPALI_CALENDAR_DATA)) {
     const yearData = NEPALI_CALENDAR_DATA[nepaliYearStr];
     const startDate = new Date(yearData.startOfYear);
 
-    // Calculate end date of the Nepali year
     const totalDaysInYear = yearData.daysInMonths.reduce(
       (sum, days) => sum + days,
       0,
@@ -591,12 +589,11 @@ export function englishToNepali(englishDate: Date): NepaliDate {
     endDate.setDate(startDate.getDate() + totalDaysInYear - 1);
 
     if (englishDate >= startDate && englishDate <= endDate) {
-      // Found the correct year, now find month and day
       const daysDiff = Math.floor(
         (englishDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
       );
 
-      let currentDay = daysDiff + 1; // +1 because we start from day 1
+      let currentDay = daysDiff + 1;
       let nepaliMonth = 1;
 
       for (const daysInMonth of yearData.daysInMonths) {
@@ -625,9 +622,8 @@ export function nepaliToEnglish(nepaliDate: NepaliDate): Date {
   }
 
   const startDate = new Date(yearData.startOfYear);
-  let daysToAdd = nepaliDate.day - 1; // -1 because we start from day 1
+  let daysToAdd = nepaliDate.day - 1;
 
-  // Add days for complete months
   for (let i = 0; i < nepaliDate.month - 1; i++) {
     daysToAdd += yearData.daysInMonths[i];
   }
@@ -687,26 +683,34 @@ export function formatNepaliDate(
   nepaliDate: NepaliDate,
   pattern: string,
 ): string {
-  const patterns: { [key: string]: string } = {
+  const replacements: { [key: string]: string } = {
     YYYY: nepaliDate.year.toString(),
     YY: nepaliDate.year.toString().slice(-2),
-    MM: nepaliDate.month.toString().padStart(2, "0"),
-    M: nepaliDate.month.toString(),
     MMMM: NEPALI_MONTHS[nepaliDate.month - 1],
     MMM: NEPALI_MONTHS[nepaliDate.month - 1].slice(0, 3),
+    MM: nepaliDate.month.toString().padStart(2, "0"),
+    M: nepaliDate.month.toString(),
     DD: nepaliDate.day.toString().padStart(2, "0"),
     D: nepaliDate.day.toString(),
     ddd: getNepaliDayName(nepaliDate),
     dd: getNepaliDayName(nepaliDate).slice(0, 3),
   };
 
-  let formatted = pattern;
-  Object.keys(patterns).forEach((key) => {
-    const regex = new RegExp(key, "g");
-    formatted = formatted.replace(regex, patterns[key]);
-  });
+  let result = pattern;
 
-  return formatted;
+  const sortedKeys = Object.keys(replacements).sort(
+    (a, b) => b.length - a.length,
+  );
+
+  for (const key of sortedKeys) {
+    const regex = new RegExp(
+      key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?![A-Za-z])",
+      "g",
+    );
+    result = result.replace(regex, replacements[key]);
+  }
+
+  return result;
 }
 
 export function getNepaliDayName(nepaliDate: NepaliDate): string {
@@ -735,7 +739,6 @@ export function addMonths(nepaliDate: NepaliDate, months: number): NepaliDate {
     newYear -= 1;
   }
 
-  // Adjust day if it exceeds days in the target month
   const daysInTargetMonth = getDaysInMonth(newYear, newMonth);
   const newDay = Math.min(nepaliDate.day, daysInTargetMonth);
 

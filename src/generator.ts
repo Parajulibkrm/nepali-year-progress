@@ -42,6 +42,7 @@ const BOTTOM_PADDING_PERCENT = 12;
 
 export function generateDotsGridJSON(
   progress: ReturnType<typeof calculateNepaliYearProgress>,
+  currentNepaliDate: NepaliDate,
   screenWidth: number,
   screenHeight: number,
 ) {
@@ -98,6 +99,32 @@ export function generateDotsGridJSON(
 
   const progressPercent = Math.round((currentDay / totalDays) * 100);
 
+  const dateText = {
+    type: "div",
+    props: {
+      style: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: "8px",
+        width: "100%",
+      },
+      children: {
+        type: "text",
+        props: {
+          style: {
+            color: "gray",
+            fontSize: `${fontSize}px`,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            fontWeight: "400",
+            textAlign: "center",
+          },
+          children: formatNepaliDate(currentNepaliDate, "MMMM DD, YYYY"),
+        },
+      },
+    },
+  };
+
   const progressText = {
     type: "div",
     props: {
@@ -150,6 +177,7 @@ export function generateDotsGridJSON(
               children: dots,
             },
           },
+          dateText,
           progressText,
         ],
       },
@@ -286,6 +314,32 @@ export function generateMonthsGridJSON(
 
   const progressPercent = Math.round((currentDay / totalDays) * 100);
 
+  const dateText = {
+    type: "div",
+    props: {
+      style: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: "8px",
+        width: "100%",
+      },
+      children: {
+        type: "text",
+        props: {
+          style: {
+            color: "gray",
+            fontSize: `${fontSize}px`,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            fontWeight: "400",
+            textAlign: "center",
+          },
+          children: formatNepaliDate(currentNepaliDate, "MMMM DD, YYYY"),
+        },
+      },
+    },
+  };
+
   const progressText = {
     type: "div",
     props: {
@@ -339,6 +393,7 @@ export function generateMonthsGridJSON(
               children: months,
             },
           },
+          dateText,
           progressText,
         ],
       },

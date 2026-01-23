@@ -1,11 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod/v4/mini";
 import { ImageResponse } from "@cloudflare/pages-plugin-vercel-og/api";
-import {
-  englishToNepali,
-  formatNepaliDate,
-  type NepaliDate,
-} from "./date_helper";
+import { englishToNepali, type NepaliDate } from "./date_helper";
 import {
   calculateNepaliYearProgress,
   generateDotsGridJSON,
@@ -54,7 +50,12 @@ app.get("/api/year-progress/days", async (c) => {
     );
     const nepaliDate = englishToNepali(currentDateInNepal);
     const progress = calculateNepaliYearProgress(nepaliDate);
-    const dotsGridResult = generateDotsGridJSON(progress, width, height);
+    const dotsGridResult = generateDotsGridJSON(
+      progress,
+      nepaliDate,
+      width,
+      height,
+    );
 
     const imageResponse = new ImageResponse(
       {

@@ -29,19 +29,19 @@ const items: {
     description: "A minimal grid of dots representing each day of the year.",
     image: days,
     type: "days",
-    icon: <Calendar className="size-5 text-primary" />,
+    icon: <Calendar className="size-5" />,
   },
   {
     title: "Months Grid",
     description: "A grid of months, showing progress within each month.",
     image: months,
     type: "months",
-    icon: <LayoutGrid className="size-5 text-primary" />,
+    icon: <LayoutGrid className="size-5" />,
   },
 ];
 export function MainCard({ onOpenSetup }: MainCardProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl px-4">
+    <div className="flex flex-col md:flex-row w-full max-w-4xl gap-4">
       {items.map((item) => (
         <Card className="flex-1 flex flex-col" key={item.type}>
           <CardHeader>
@@ -51,7 +51,7 @@ export function MainCard({ onOpenSetup }: MainCardProps) {
             </CardTitle>
             <CardDescription>{item.description}</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 flex items-center justify-center bg-muted/30 rounded-md mt-0 overflow-hidden">
+          <CardContent className="flex-1 flex items-center justify-center bg-[#1a1a1a] rounded-lg mt-0 overflow-hidden">
             <img
               src={item.image}
               alt={`${item.title} Preview`}
@@ -62,7 +62,7 @@ export function MainCard({ onOpenSetup }: MainCardProps) {
             <Button
               onClick={() => onOpenSetup(item.type)}
               className="w-full"
-              variant={"outline"}
+              variant={"default"}
             >
               Setup {item.title}
             </Button>

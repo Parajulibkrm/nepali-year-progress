@@ -32,7 +32,7 @@ export function Footer() {
         href="https://github.com/bimsina/nepali-year-progress"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-full text-foreground transition-all hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 px-4 py-2 bg-muted rounded-full text-foreground"
       >
         <Github className="size-4" />
         <span>View on GitHub</span>
