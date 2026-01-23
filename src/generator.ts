@@ -38,6 +38,22 @@ export function calculateNepaliYearProgress(currentNepaliDate: NepaliDate) {
   };
 }
 
+function getMonthStartingDays(nepaliYear: number): number[] {
+  const monthStartDays: number[] = [];
+
+  for (let month = 1; month <= 12; month++) {
+    const firstDayOfMonth: NepaliDate = {
+      year: nepaliYear,
+      month: month,
+      day: 1,
+    };
+    const dayOfWeek = getNepaliDayOfWeek(firstDayOfMonth);
+    monthStartDays[month] = dayOfWeek;
+  }
+
+  return monthStartDays;
+}
+
 const TOP_PADDING_PERCENT = 25;
 const BOTTOM_PADDING_PERCENT = 12;
 
@@ -228,35 +244,29 @@ export function generateMonthsGridJSON(
   const dayCellWidth = monthWidth / dayCols;
   const dayCellHeight = (monthHeight * 0.75) / dayRows;
 
-  const dayCellSize = Math.min(dayCellWidth, dayCellHeight);
-  const dotSize = dayCellSize * 0.5;
+  const dayCellSize = Math.floor(Math.min(dayCellWidth, dayCellHeight));
+  const dotSize = Math.floor(dayCellSize * 0.5);
   const gap = dayCellSize - dotSize;
+  const dotMargin = Math.floor(gap / 2);
 
   const months = [];
+
+  const monthStartingDays = getMonthStartingDays(currentNepaliDate.year);
 
   for (let m = 1; m <= 12; m++) {
     const daysInThisMonth = getDaysInMonth(currentNepaliDate.year, m);
     const monthDots = [];
 
-    // Get the day of week for the first day of this month (0=Sunday, 1=Monday, etc.)
-    const firstDayOfMonth: NepaliDate = {
-      year: currentNepaliDate.year,
-      month: m,
-      day: 1,
-    };
-    const startingDayOfWeek = getNepaliDayOfWeek(firstDayOfMonth);
+    const actualStartingDay = monthStartingDays[m];
 
-    // Create empty cells for days before the first day of month
-    for (let emptyDay = 0; emptyDay < startingDayOfWeek; emptyDay++) {
+    for (let emptyDay = 0; emptyDay < actualStartingDay; emptyDay++) {
       monthDots.push({
         type: "div",
         props: {
           style: {
             width: `${dotSize}px`,
             height: `${dotSize}px`,
-            backgroundColor: "transparent",
-            borderRadius: "50%",
-            margin: `${gap / 2}px`,
+            margin: `${dotMargin}px`,
             opacity: 0,
           },
         },
@@ -286,27 +296,8 @@ export function generateMonthsGridJSON(
             height: `${dotSize}px`,
             backgroundColor: isCurrent ? "red" : "white",
             borderRadius: "50%",
-            margin: `${gap / 2}px`,
+            margin: `${dotMargin}px`,
             opacity: isPassed || isCurrent ? 1 : 0.2,
-          },
-        },
-      });
-    }
-
-    // Fill remaining cells if needed to complete the grid
-    const totalCellsUsed = startingDayOfWeek + daysInThisMonth;
-    const totalCells = dayCols * dayRows;
-    for (let fillDay = totalCellsUsed; fillDay < totalCells; fillDay++) {
-      monthDots.push({
-        type: "div",
-        props: {
-          style: {
-            width: `${dotSize}px`,
-            height: `${dotSize}px`,
-            backgroundColor: "transparent",
-            borderRadius: "50%",
-            margin: `${gap / 2}px`,
-            opacity: 0,
           },
         },
       });
@@ -331,10 +322,10 @@ export function generateMonthsGridJSON(
                 color: "gray",
                 fontSize: `${monthTitleFontSize}px`,
                 fontFamily: "system-ui, -apple-system, sans-serif",
-                marginBottom: "2px",
-                width: `${dayCols * dayCellSize}px`,
+                marginBottom: "16px",
+                width: `${7 * (dotSize + 2 * dotMargin)}px`,
                 textAlign: "left",
-                paddingLeft: `${gap / 2}px`,
+                paddingLeft: `${dotMargin}px`,
               },
               children: NEPALI_MONTHS[m - 1],
             },
@@ -346,8 +337,9 @@ export function generateMonthsGridJSON(
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "wrap",
-                width: `${dayCols * dayCellSize}px`,
+                width: `${7 * (dotSize + 2 * dotMargin)}px`,
                 justifyContent: "flex-start",
+                alignItems: "flex-start",
               },
               children: monthDots,
             },
