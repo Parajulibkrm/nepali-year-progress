@@ -12,6 +12,8 @@ import {
 } from "../ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import copy from "copy-to-clipboard";
 
 type Platform = "ios" | "android";
@@ -42,8 +44,19 @@ export function DeviceSetup({
 }: DeviceSetupProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [comboboxOpen, setComboboxOpen] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState("");
+
+  // Initialize selected device with default based on platform
+  const [selectedDevice, setSelectedDevice] = useState(() => {
+    const defaultDeviceValue =
+      platform === "ios" ? "iphone_16_pro" : "samsung_galaxy_s25_ultra";
+    const deviceExists = devices.some((d) => d.value === defaultDeviceValue);
+    return deviceExists ? defaultDeviceValue : "";
+  });
+
   const [copied, setCopied] = useState(false);
+  const [customWidth, setCustomWidth] = useState("");
+  const [customHeight, setCustomHeight] = useState("");
+  const [useCustom, setUseCustom] = useState(false);
 
   const filteredDevices = useMemo(() => {
     let filtered = devices.filter((d) => d.platform === platform);
@@ -59,10 +72,24 @@ export function DeviceSetup({
   }, [selectedDevice, devices]);
 
   const wallpaperUrl = useMemo(() => {
+    if (useCustom && customWidth && customHeight) {
+      const width = parseInt(customWidth, 10);
+      const height = parseInt(customHeight, 10);
+      if (width > 0 && height > 0) {
+        const endpoint = wallpaperType === "days" ? "days" : "months";
+        return `${window.location.origin}/api/${endpoint}?width=${width}&height=${height}`;
+      }
+    }
     if (!selectedDeviceDetails) return "";
     const endpoint = wallpaperType === "days" ? "days" : "months";
     return `${window.location.origin}/api/${endpoint}?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
-  }, [selectedDeviceDetails, wallpaperType]);
+  }, [
+    selectedDeviceDetails,
+    wallpaperType,
+    useCustom,
+    customWidth,
+    customHeight,
+  ]);
 
   const handleCopyUrl = async () => {
     try {
@@ -113,10 +140,13 @@ export function DeviceSetup({
                   className="w-full justify-between h-11 flex"
                 >
                   <span className="flex-1 truncate text-left">
-                    {selectedDevice
-                      ? filteredDevices.find((d) => d.value === selectedDevice)
-                          ?.label
-                      : "Select your device"}
+                    {useCustom
+                      ? "Custom Device"
+                      : selectedDevice
+                        ? filteredDevices.find(
+                            (d) => d.value === selectedDevice,
+                          )?.label
+                        : "Select your device"}
                   </span>
                   <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -131,11 +161,34 @@ export function DeviceSetup({
                   <CommandList>
                     <CommandEmpty>No device found.</CommandEmpty>
                     <CommandGroup>
+                      <CommandItem
+                        value="custom"
+                        onSelect={(currentValue) => {
+                          if (currentValue === "custom") {
+                            setUseCustom(true);
+                            setSelectedDevice("");
+                          } else {
+                            setUseCustom(false);
+                            setSelectedDevice(
+                              currentValue === selectedDevice
+                                ? ""
+                                : currentValue,
+                            );
+                          }
+                          setComboboxOpen(false);
+                        }}
+                      >
+                        <CheckIcon
+                          className={`mr-2 h-4 w-4 ${useCustom ? "opacity-100" : "opacity-0"}`}
+                        />
+                        Custom Device
+                      </CommandItem>
                       {filteredDevices.map((device) => (
                         <CommandItem
                           key={device.value}
                           value={device.value}
                           onSelect={(currentValue) => {
+                            setUseCustom(false);
                             setSelectedDevice(
                               currentValue === selectedDevice
                                 ? ""
@@ -155,6 +208,39 @@ export function DeviceSetup({
                 </Command>
               </PopoverContent>
             </Popover>
+            {useCustom && (
+              <div className="space-y-3 pt-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="custom-width">Width (px)</Label>
+                    <Input
+                      id="custom-width"
+                      type="number"
+                      placeholder="e.g., 1080"
+                      value={customWidth}
+                      onChange={(e) => setCustomWidth(e.target.value)}
+                      min="1"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="custom-height">Height (px)</Label>
+                    <Input
+                      id="custom-height"
+                      type="number"
+                      placeholder="e.g., 1920"
+                      value={customHeight}
+                      onChange={(e) => setCustomHeight(e.target.value)}
+                      min="1"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter your device's screen resolution. You can find this in
+                  your device settings or by searching online for your device
+                  model.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -186,30 +272,57 @@ export function DeviceSetup({
             </div>
           ) : (
             <div className="ml-10 bg-muted p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                Open{" "}
-                <a
-                  href="shortcuts://"
-                  className="text-foreground font-medium underline underline-offset-2"
-                >
-                  Shortcuts
-                </a>{" "}
-                app → Go to{" "}
-                <span className="text-foreground font-medium">Automation</span>{" "}
-                tab → New Automation →{" "}
-                <span className="text-foreground font-medium">Time of Day</span>{" "}
-                → <span className="text-foreground font-medium">6:00 AM</span> →
-                Repeat{" "}
-                <span className="text-foreground font-medium">"Daily"</span> →
-                Select{" "}
-                <span className="text-foreground font-medium">
-                  "Run Immediately"
-                </span>{" "}
-                →{" "}
-                <span className="text-foreground font-medium">
-                  "Create New Shortcut"
-                </span>
-              </p>
+              <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                <li>
+                  Open{" "}
+                  <a
+                    href="shortcuts://"
+                    className="text-foreground font-medium underline underline-offset-2"
+                  >
+                    Shortcuts
+                  </a>{" "}
+                  app
+                </li>
+                <li>
+                  Go to{" "}
+                  <span className="text-foreground font-medium">
+                    Automation
+                  </span>{" "}
+                  tab
+                </li>
+                <li>
+                  Tap{" "}
+                  <span className="text-foreground font-medium">
+                    New Automation
+                  </span>
+                </li>
+                <li>
+                  Select{" "}
+                  <span className="text-foreground font-medium">
+                    Time of Day
+                  </span>
+                </li>
+                <li>
+                  Set time to{" "}
+                  <span className="text-foreground font-medium">6:00 AM</span>
+                </li>
+                <li>
+                  Set Repeat to{" "}
+                  <span className="text-foreground font-medium">"Daily"</span>
+                </li>
+                <li>
+                  Select{" "}
+                  <span className="text-foreground font-medium">
+                    "Run Immediately"
+                  </span>
+                </li>
+                <li>
+                  Tap{" "}
+                  <span className="text-foreground font-medium">
+                    "Create New Shortcut"
+                  </span>
+                </li>
+              </ol>
             </div>
           )}
         </div>
@@ -225,22 +338,51 @@ export function DeviceSetup({
           </div>
           <div className="ml-10 bg-muted p-4 rounded-lg">
             {platform === "android" ? (
-              <p className="text-sm text-muted-foreground">
-                Open{" "}
-                <span className="text-foreground font-medium">MacroDroid</span>{" "}
-                → <span className="text-foreground font-medium">Add Macro</span>
-                <br />
-                <br />
-                <span className="text-foreground font-medium">
-                  Trigger:
-                </span>{" "}
-                Date/Time → Day/Time → Set time to{" "}
-                <span className="text-foreground font-medium">00:01:00</span> →
-                Activate{" "}
-                <span className="text-foreground font-medium">
-                  all weekdays
-                </span>
-              </p>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <ol className="space-y-1 list-decimal list-inside">
+                  <li>
+                    Open{" "}
+                    <span className="text-foreground font-medium">
+                      MacroDroid
+                    </span>
+                  </li>
+                  <li>
+                    Tap{" "}
+                    <span className="text-foreground font-medium">
+                      Add Macro
+                    </span>
+                  </li>
+                </ol>
+                <div>
+                  <span className="text-foreground font-medium">Trigger:</span>
+                  <ol className="mt-1 space-y-1 list-decimal list-inside ml-4">
+                    <li>
+                      Select{" "}
+                      <span className="text-foreground font-medium">
+                        Date/Time
+                      </span>
+                    </li>
+                    <li>
+                      Choose{" "}
+                      <span className="text-foreground font-medium">
+                        Day/Time
+                      </span>
+                    </li>
+                    <li>
+                      Set time to{" "}
+                      <span className="text-foreground font-medium">
+                        00:01:00
+                      </span>
+                    </li>
+                    <li>
+                      Activate{" "}
+                      <span className="text-foreground font-medium">
+                        all weekdays
+                      </span>
+                    </li>
+                  </ol>
+                </div>
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">
                 Follow the standard shortcut creation steps to create a shortcut
@@ -272,16 +414,16 @@ export function DeviceSetup({
                   {platform === "android" ? "4.1" : "3.1"}
                 </span>
                 <div className="text-sm space-y-2 wrap-break-word flex-1 w-full">
-                  <p>
-                    <span className="font-medium">
-                      {platform === "ios"
-                        ? '"Get Contents of URL"'
-                        : "Download Image"}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {platform === "ios" ? " → paste the following URL:" : ""}
-                    </span>
+                  <p className="font-medium">
+                    {platform === "ios"
+                      ? '"Get Contents of URL"'
+                      : "Download Image"}
                   </p>
+                  {platform === "ios" && (
+                    <ol className="text-muted-foreground space-y-1 list-decimal list-inside text-sm">
+                      <li>Paste the following URL:</li>
+                    </ol>
+                  )}
                   {platform === "android" && (
                     <ul className="text-muted-foreground space-y-1 list-disc list-inside text-sm">
                       <li>
@@ -299,29 +441,54 @@ export function DeviceSetup({
                         <span className="text-foreground font-medium">GET</span>
                       </li>
                       <li>Paste the URL below:</li>
+                      <li>
+                        Enable:{" "}
+                        <span className="text-foreground font-medium">
+                          Block next actions until complete
+                        </span>
+                      </li>
+                      <li>
+                        Response: Tick{" "}
+                        <span className="text-foreground font-medium">
+                          Save HTTP response to file
+                        </span>
+                      </li>
+                      <li>
+                        Folder & filename:{" "}
+                        <code className="text-foreground font-mono text-xs bg-background px-1 py-0.5 rounded">
+                          /Download/nepali-cal.png
+                        </code>
+                      </li>
                     </ul>
                   )}
-                  {selectedDevice && (
-                    <div className="flex gap-2 mt-2 pr-6">
-                      <code className="flex flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border text-xs items-center">
-                        {wallpaperUrl}
-                      </code>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleCopyUrl}
-                      >
-                        {copied ? (
-                          <CopyCheck className="size-4" />
-                        ) : (
-                          <Copy className="size-4" />
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                  {!selectedDevice && (
+                  {(selectedDevice ||
+                    (useCustom && customWidth && customHeight)) &&
+                    wallpaperUrl && (
+                      <div className="flex gap-2 mt-2 pr-6">
+                        <code className="flex flex-1 w-full truncate font-mono rounded-md px-2 py-1 bg-background border text-xs items-center">
+                          {wallpaperUrl}
+                        </code>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleCopyUrl}
+                        >
+                          {copied ? (
+                            <CopyCheck className="size-4" />
+                          ) : (
+                            <Copy className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                    )}
+                  {!selectedDevice && !useCustom && (
                     <p className="text-xs text-muted-foreground italic">
                       Select a device above to generate the URL
+                    </p>
+                  )}
+                  {useCustom && (!customWidth || !customHeight) && (
+                    <p className="text-xs text-muted-foreground italic">
+                      Enter width and height above to generate the URL
                     </p>
                   )}
                 </div>
@@ -339,23 +506,38 @@ export function DeviceSetup({
                       ? '"Set Wallpaper Photo"'
                       : "Set Wallpaper"}
                   </p>
-                  {platform === "ios" ? (
-                    <p className="text-muted-foreground">
-                      → choose "Lock Screen"
-                    </p>
-                  ) : (
-                    <ul className="text-muted-foreground space-y-1 list-disc list-inside text-sm">
+                  {platform === "ios" && (
+                    <ol className="text-muted-foreground space-y-1 list-decimal list-inside text-sm">
+                      <li>Choose "Lock Screen"</li>
+                    </ol>
+                  )}
+                  {platform === "android" && (
+                    <ol className="text-muted-foreground space-y-1 list-decimal list-inside text-sm">
                       <li>
                         Go to{" "}
                         <span className="text-foreground font-medium">
                           Device Settings
-                        </span>{" "}
-                        →{" "}
+                        </span>
+                      </li>
+                      <li>
+                        Select{" "}
                         <span className="text-foreground font-medium">
                           Set Wallpaper
                         </span>
                       </li>
-                    </ul>
+                      <li>
+                        Choose{" "}
+                        <span className="text-foreground font-medium">
+                          Image and Screen
+                        </span>
+                      </li>
+                      <li>
+                        Enter folder & filename:{" "}
+                        <code className="text-foreground font-mono text-xs bg-background px-1 py-0.5 rounded">
+                          /Download/nepali-cal.png
+                        </code>
+                      </li>
+                    </ol>
                   )}
                 </div>
               </div>
@@ -366,9 +548,14 @@ export function DeviceSetup({
                 <strong>Important:</strong>{" "}
                 {platform === "ios" ? (
                   <>
-                    In "Set Wallpaper Photo", tap the arrow (→) to show options
-                    → disable both <strong>"Crop to Subject"</strong> and{" "}
-                    <strong>"Show Preview"</strong>
+                    In "Set Wallpaper Photo":
+                    <ol className="mt-1 space-y-1 list-decimal list-inside ml-4">
+                      <li>Tap the arrow (→) to show options</li>
+                      <li>
+                        Disable both <strong>"Crop to Subject"</strong> and{" "}
+                        <strong>"Show Preview"</strong>
+                      </li>
+                    </ol>
                   </>
                 ) : (
                   <>
@@ -396,12 +583,15 @@ export function DeviceSetup({
               <h3 className="font-semibold">Finalize</h3>
             </div>
             <div className="ml-10 bg-muted p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                Give the macro a name → Tap{" "}
-                <span className="text-foreground font-medium">
-                  Create Macro
-                </span>
-              </p>
+              <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                <li>Give the macro a name</li>
+                <li>
+                  Tap{" "}
+                  <span className="text-foreground font-medium">
+                    Create Macro
+                  </span>
+                </li>
+              </ol>
             </div>
           </div>
         )}
