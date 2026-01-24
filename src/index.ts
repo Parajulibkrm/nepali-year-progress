@@ -49,6 +49,19 @@ app.get("/api/days", async (c) => {
       currentUTC.getTime() + 5 * 60 * 60 * 1000 + 45 * 60 * 1000,
     );
     const nepaliDate = englishToNepali(currentDateInNepal);
+
+    // Check cache first (use actual URL + date for cache key)
+    const cache = caches.default;
+    const cacheUrl = new URL(c.req.url);
+    cacheUrl.searchParams.set("_date", `${nepaliDate.year}-${nepaliDate.month}-${nepaliDate.day}`);
+    const cacheKey = new Request(cacheUrl.toString());
+
+    const cachedResponse = await cache.match(cacheKey);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Generate image on cache miss
     const progress = calculateNepaliYearProgress(nepaliDate);
     const dotsGridResult = generateDotsGridJSON(
       progress,
@@ -85,6 +98,9 @@ app.get("/api/days", async (c) => {
       imageResponse.headers.set(key, value);
     });
 
+    // Store in cache (don't await to avoid blocking response)
+    c.executionCtx.waitUntil(cache.put(cacheKey, imageResponse.clone()));
+
     return imageResponse;
   } catch (error) {
     console.error("Image generation error:", error);
@@ -108,6 +124,19 @@ app.get("/api/months", async (c) => {
       currentUTC.getTime() + 5 * 60 * 60 * 1000 + 45 * 60 * 1000,
     );
     const nepaliDate = englishToNepali(currentDateInNepal);
+
+    // Check cache first (use actual URL + date for cache key)
+    const cache = caches.default;
+    const cacheUrl = new URL(c.req.url);
+    cacheUrl.searchParams.set("_date", `${nepaliDate.year}-${nepaliDate.month}-${nepaliDate.day}`);
+    const cacheKey = new Request(cacheUrl.toString());
+
+    const cachedResponse = await cache.match(cacheKey);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    // Generate image on cache miss
     const progress = calculateNepaliYearProgress(nepaliDate);
     const monthsGridResult = generateMonthsGridJSON(
       progress,
@@ -143,6 +172,9 @@ app.get("/api/months", async (c) => {
     Object.entries(cacheHeaders).forEach(([key, value]) => {
       imageResponse.headers.set(key, value);
     });
+
+    // Store in cache (don't await to avoid blocking response)
+    c.executionCtx.waitUntil(cache.put(cacheKey, imageResponse.clone()));
 
     return imageResponse;
   } catch (error) {
