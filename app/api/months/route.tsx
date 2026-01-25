@@ -35,6 +35,14 @@ export async function GET(request: NextRequest) {
       height
     );
 
+    // Calculate seconds until midnight Nepal time for cache expiry
+    const nepalMidnight = new Date(currentDateInNepal);
+    nepalMidnight.setHours(24, 0, 0, 0);
+    const secondsUntilMidnight = Math.max(
+      60,
+      Math.floor((nepalMidnight.getTime() - currentDateInNepal.getTime()) / 1000)
+    );
+
     return new ImageResponse(
       (
         <div
@@ -55,6 +63,9 @@ export async function GET(request: NextRequest) {
       {
         width,
         height,
+        headers: {
+          "Cache-Control": `public, s-maxage=${secondsUntilMidnight}, stale-while-revalidate=60`,
+        },
       }
     );
   } catch (error) {
