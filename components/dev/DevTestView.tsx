@@ -25,7 +25,7 @@ export function DevTestView() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Days Grid */}
               <Card>
                 <CardHeader className="py-3 px-4">
@@ -66,6 +66,28 @@ export function DevTestView() {
                   />
                   <div className="mt-2 text-[10px] text-muted-foreground break-all font-mono">
                     {`/api/months?width=${device.width}&height=${device.height}`}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Current Month Grid */}
+              <Card>
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-sm font-medium">
+                    Current Month
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 bg-muted/20">
+                  <Image
+                    src={`/api/current-month?width=${device.width}&height=${device.height}`}
+                    alt={`${device.label} Current Month`}
+                    width={device.width}
+                    height={device.height}
+                    className="w-full h-auto aspect-[9/19.5] object-contain bg-black rounded shadow-lg border"
+                    loading="lazy"
+                  />
+                  <div className="mt-2 text-[10px] text-muted-foreground break-all font-mono">
+                    {`/api/current-month?width=${device.width}&height=${device.height}`}
                   </div>
                 </CardContent>
               </Card>

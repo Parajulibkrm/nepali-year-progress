@@ -1,6 +1,5 @@
 import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
-
-type Platform = "ios" | "android";
+import { type Platform } from "@/lib/types";
 
 interface PlatformSelectionProps {
   onSelectPlatform: (platform: Platform) => void;

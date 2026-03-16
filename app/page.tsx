@@ -6,10 +6,9 @@ import { MainCard, Footer, Header } from "@/components/home";
 import SetupDialog from "@/components/setup";
 import { DevTestView } from "@/components/dev/DevTestView";
 import { Toaster } from "@/components/ui/sonner";
+import { type Platform, type WallpaperType } from "@/lib/types";
 
-type Platform = "ios" | "android";
 type Step = "platform" | "setup";
-type WallpaperType = "days" | "months";
 
 export default function Page() {
   const [dialogOpen, setDialogOpen] = useState(false);

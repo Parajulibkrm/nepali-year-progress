@@ -7,12 +7,12 @@ import {
   CardFooter,
   CardDescription,
 } from "../ui/card";
-import { Calendar, LayoutGrid } from "lucide-react";
+import { Calendar, CalendarDays, LayoutGrid } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
 import days from "@/assets/days.png";
 import months from "@/assets/months.png";
-
-type WallpaperType = "days" | "months";
+import currentMonth from "@/assets/current_month.png";
+import { type WallpaperType } from "@/lib/types";
 
 interface MainCardProps {
   onOpenSetup: (type: WallpaperType) => void;
@@ -38,6 +38,13 @@ const items: {
     image: months,
     type: "months",
     icon: <LayoutGrid className="size-5" />,
+  },
+  {
+    title: "Current Month",
+    description: "Focus on the current Nepali month only.",
+    image: currentMonth,
+    type: "current-month",
+    icon: <CalendarDays className="size-5" />,
   },
 ];
 export function MainCard({ onOpenSetup }: MainCardProps) {

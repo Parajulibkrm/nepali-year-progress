@@ -1,19 +1,12 @@
 import { Dialog, DialogContent } from "../ui/dialog";
 import { PlatformSelection } from "./PlatformSelection";
 import { DeviceSetup } from "./DeviceSetup";
-
-type Platform = "ios" | "android";
+import {
+  type DeviceSpec as Device,
+  type Platform,
+  type WallpaperType,
+} from "@/lib/types";
 type Step = "platform" | "setup";
-
-interface Device {
-  value: string;
-  label: string;
-  platform: Platform;
-  width: number;
-  height: number;
-}
-
-type WallpaperType = "days" | "months";
 
 interface SetupDialogProps {
   open: boolean;

@@ -1,4 +1,6 @@
-export const devices: { value: string; label: string; width: number; height: number; platform: "ios" | "android" }[] = [
+import { type DeviceSpec } from "./types";
+
+export const devices: DeviceSpec[] = [
     {
         value: "iphone_13_mini",
         label: "iPhone 13 mini",

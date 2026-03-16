@@ -1,9 +1,6 @@
 import { NextRequest } from "next/server";
 import { englishToNepali } from "@/lib/date_helper";
-import {
-  calculateNepaliYearProgress,
-  generateDotsGridJSON,
-} from "@/lib/generator";
+import { generateCurrentMonthGridJSON } from "@/lib/generator";
 import {
   createOgImageResponse,
   getCurrentDateInNepal,
@@ -24,9 +21,7 @@ export async function GET(request: NextRequest) {
     const currentDateInNepal = getCurrentDateInNepal();
     const nepaliDate = englishToNepali(currentDateInNepal);
 
-    const progress = calculateNepaliYearProgress(nepaliDate);
-    const dotsGridResult = generateDotsGridJSON(
-      progress,
+    const currentMonthResult = generateCurrentMonthGridJSON(
       nepaliDate,
       width,
       height,
@@ -35,7 +30,7 @@ export async function GET(request: NextRequest) {
     const secondsUntilMidnight = getSecondsUntilNepalMidnight(currentDateInNepal);
 
     return createOgImageResponse(
-      dotsGridResult,
+      currentMonthResult,
       width,
       height,
       secondsUntilMidnight,

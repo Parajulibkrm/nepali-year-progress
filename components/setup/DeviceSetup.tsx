@@ -15,17 +15,11 @@ import { DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import copy from "copy-to-clipboard";
-
-type Platform = "ios" | "android";
-type WallpaperType = "days" | "months";
-
-interface Device {
-  value: string;
-  label: string;
-  platform: Platform;
-  width: number;
-  height: number;
-}
+import {
+  type DeviceSpec as Device,
+  type Platform,
+  type WallpaperType,
+} from "@/lib/types";
 
 interface DeviceSetupProps {
   platform: Platform;
@@ -33,6 +27,12 @@ interface DeviceSetupProps {
   wallpaperType: WallpaperType;
   onBack: () => void;
   onClose: () => void;
+}
+
+function getWallpaperEndpoint(wallpaperType: WallpaperType) {
+  if (wallpaperType === "days") return "days";
+  if (wallpaperType === "months") return "months";
+  return "current-month";
 }
 
 export function DeviceSetup({
@@ -58,30 +58,43 @@ export function DeviceSetup({
   const [customHeight, setCustomHeight] = useState("");
   const [useCustom, setUseCustom] = useState(false);
 
+  const platformDevices = useMemo(() => {
+    return devices.filter((d) => d.platform === platform);
+  }, [platform, devices]);
+
   const filteredDevices = useMemo(() => {
-    let filtered = devices.filter((d) => d.platform === platform);
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((d) => d.label.toLowerCase().includes(query));
-    }
-    return filtered;
-  }, [platform, searchQuery, devices]);
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return platformDevices;
+
+    const normalizedQuery = query.replace(/[_/\s+-]+/g, " ");
+
+    return platformDevices.filter((d) => {
+      const normalizedLabel = d.label.toLowerCase().replace(/[_/\s+-]+/g, " ");
+      const normalizedValue = d.value.toLowerCase().replace(/[_/\s+-]+/g, " ");
+      return (
+        normalizedLabel.includes(normalizedQuery) ||
+        normalizedValue.includes(normalizedQuery)
+      );
+    });
+  }, [searchQuery, platformDevices]);
 
   const selectedDeviceDetails = useMemo(() => {
-    return devices.find((d) => d.value === selectedDevice);
-  }, [selectedDevice, devices]);
+    return platformDevices.find((d) => d.value === selectedDevice);
+  }, [selectedDevice, platformDevices]);
+
+  const selectedDeviceLabel = selectedDeviceDetails?.label ?? "Select your device";
 
   const wallpaperUrl = useMemo(() => {
     if (useCustom && customWidth && customHeight) {
       const width = parseInt(customWidth, 10);
       const height = parseInt(customHeight, 10);
       if (width > 0 && height > 0) {
-        const endpoint = wallpaperType === "days" ? "days" : "months";
+        const endpoint = getWallpaperEndpoint(wallpaperType);
         return `${window.location.origin}/api/${endpoint}?width=${width}&height=${height}`;
       }
     }
     if (!selectedDeviceDetails) return "";
-    const endpoint = wallpaperType === "days" ? "days" : "months";
+    const endpoint = getWallpaperEndpoint(wallpaperType);
     return `${window.location.origin}/api/${endpoint}?width=${selectedDeviceDetails.width}&height=${selectedDeviceDetails.height}`;
   }, [
     selectedDeviceDetails,
@@ -129,7 +142,10 @@ export function DeviceSetup({
           <div className="ml-10 space-y-3">
             <Popover
               open={comboboxOpen}
-              onOpenChange={setComboboxOpen}
+              onOpenChange={(open) => {
+                setComboboxOpen(open);
+                if (!open) setSearchQuery("");
+              }}
               modal={true}
             >
               <PopoverTrigger asChild>
@@ -143,16 +159,14 @@ export function DeviceSetup({
                     {useCustom
                       ? "Custom Device"
                       : selectedDevice
-                        ? filteredDevices.find(
-                            (d) => d.value === selectedDevice,
-                          )?.label
+                        ? selectedDeviceLabel
                         : "Select your device"}
                   </span>
                   <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="p-0">
-                <Command>
+                <Command shouldFilter={false}>
                   <CommandInput
                     placeholder="Search for your phone model..."
                     value={searchQuery}
@@ -176,6 +190,7 @@ export function DeviceSetup({
                                 : currentValue,
                             );
                           }
+                          setSearchQuery("");
                           setComboboxOpen(false);
                         }}
                       >
@@ -196,6 +211,7 @@ export function DeviceSetup({
                                 ? ""
                                 : currentValue,
                             );
+                            setSearchQuery("");
                             setComboboxOpen(false);
                           }}
                         >

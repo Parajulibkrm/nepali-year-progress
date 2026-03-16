@@ -10,7 +10,7 @@ import {
 function getLastDayOfNepaliMonth(year: number, month: number): number {
   try {
     return getDaysInMonth(year, month);
-  } catch (e) {
+  } catch {
     return 29;
   }
 }
@@ -90,7 +90,7 @@ export function generateDotsGridJSON(
 
   const dots = [];
 
-  let currentDayIndex = currentDay - 1;
+  const currentDayIndex = currentDay - 1;
 
   for (let day = 0; day < cols * rows; day++) {
     const isPassed = day < currentDayIndex;
@@ -428,6 +428,168 @@ export function generateMonthsGridJSON(
                 gap: `${monthGap}px`,
               },
               children: months,
+            },
+          },
+          dateText,
+          progressText,
+        ],
+      },
+    },
+    paddingValues: {
+      top: topPadding,
+      bottom: bottomPadding,
+    },
+  };
+}
+
+export function generateCurrentMonthGridJSON(
+  currentNepaliDate: NepaliDate,
+  screenWidth: number,
+  screenHeight: number,
+) {
+  const topPadding = Math.round((screenHeight * 34) / 100);
+  const bottomPadding = Math.round((screenHeight * 20) / 100);
+
+  const textFontSize = Math.max(screenHeight * 0.0125, 13);
+
+  const availableHeight = Math.max(screenHeight * 0.28, 270);
+  const availableWidth = screenWidth * 0.5;
+
+  const cols = 7;
+  const rows = 6;
+
+  const cellWidth = availableWidth / cols;
+  const cellHeight = availableHeight / rows;
+  const cellSize = Math.floor(Math.min(cellWidth, cellHeight));
+  const dotSize = Math.max(7, Math.floor(cellSize * 0.46));
+  const gap = Math.max(1, cellSize - dotSize);
+  const dotMargin = Math.floor(gap / 2);
+
+  const daysInCurrentMonth = getDaysInMonth(
+    currentNepaliDate.year,
+    currentNepaliDate.month,
+  );
+  const currentMonthStartDay = getMonthStartingDays(currentNepaliDate.year)[
+    currentNepaliDate.month
+  ];
+  const daysRemainingInMonth = daysInCurrentMonth - currentNepaliDate.day;
+  const progressPercent = Math.round(
+    (currentNepaliDate.day / daysInCurrentMonth) * 100,
+  );
+
+  const monthDots = [];
+
+  for (let emptyDay = 0; emptyDay < currentMonthStartDay; emptyDay++) {
+    monthDots.push({
+      type: "div",
+      props: {
+        style: {
+          width: `${dotSize}px`,
+          height: `${dotSize}px`,
+          margin: `${dotMargin}px`,
+          opacity: 0,
+        },
+      },
+    });
+  }
+
+  for (let day = 1; day <= daysInCurrentMonth; day++) {
+    const isPassed = day < currentNepaliDate.day;
+    const isCurrent = day === currentNepaliDate.day;
+
+    monthDots.push({
+      type: "div",
+      props: {
+        style: {
+          width: `${dotSize}px`,
+          height: `${dotSize}px`,
+          backgroundColor: isCurrent ? "red" : "white",
+          borderRadius: "50%",
+          margin: `${dotMargin}px`,
+          opacity: isPassed || isCurrent ? 1 : 0.2,
+        },
+      },
+    });
+  }
+
+  const monthGridWidth = cols * (dotSize + 2 * dotMargin);
+
+  const dateText = {
+    type: "div",
+    props: {
+      style: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "14px",
+        width: "100%",
+      },
+      children: {
+        type: "text",
+        props: {
+          style: {
+            color: "gray",
+            fontSize: `${textFontSize}px`,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            fontWeight: "400",
+            textAlign: "center",
+          },
+          children: formatNepaliDate(currentNepaliDate, "MMMM DD, YYYY"),
+        },
+      },
+    },
+  };
+
+  const progressText = {
+    type: "div",
+    props: {
+      style: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "8px",
+        width: "100%",
+      },
+      children: {
+        type: "text",
+        props: {
+          style: {
+            color: "gray",
+            fontSize: `${textFontSize}px`,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            fontWeight: "500",
+            textAlign: "center",
+          },
+          children: `${daysRemainingInMonth}d left this month • ${progressPercent}%`,
+        },
+      },
+    },
+  };
+
+  return {
+    grid: {
+      type: "div",
+      props: {
+        style: {
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+        },
+        children: [
+          {
+            type: "div",
+            props: {
+              style: {
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                width: `${monthGridWidth}px`,
+              },
+              children: monthDots,
             },
           },
           dateText,
