@@ -20,12 +20,21 @@ All endpoints accept:
 
 - `width` (optional, default `1170`)
 - `height` (optional, default `2532`)
+- `backgroundImageUrl` (optional): remote image URL used as full-canvas background
+- `overlayAlpha` (optional): black tint alpha between `0` and `1`
+- `handleText` (optional): custom text rendered below progress text (same style)
 
 Routes:
 
 - `/api/days?width=1170&height=2532`
 - `/api/months?width=1170&height=2532`
 - `/api/current-month?width=1170&height=2532`
+
+Example with customization:
+
+- `/api/days?width=1170&height=2532&backgroundImageUrl=https%3A%2F%2Fimages.example.com%2Fbg.jpg&overlayAlpha=0.35&handleText=%40yourhandle`
+- `/api/months?width=1170&height=2532&backgroundImageUrl=https%3A%2F%2Fimages.example.com%2Fbg.jpg&overlayAlpha=0.35&handleText=%40yourhandle`
+- `/api/current-month?width=1170&height=2532&backgroundImageUrl=https%3A%2F%2Fimages.example.com%2Fbg.jpg&overlayAlpha=0.35&handleText=%40yourhandle`
 
 ## Local Development
 
