@@ -105,8 +105,8 @@ export function createOgImageResponse(
   secondsUntilMidnight: number,
   options?: OgRenderOptions,
 ) {
-  const overlayAlpha = options?.overlayAlpha ?? 0;
   const backgroundImageUrl = options?.backgroundImageUrl;
+  const overlayAlpha = options?.overlayAlpha ?? (backgroundImageUrl ? 0.35 : 0);
 
   return new ImageResponse(
     <div
@@ -117,21 +117,38 @@ export function createOgImageResponse(
         position: "relative",
         width: "100%",
         height: "100%",
-        backgroundColor: backgroundImageUrl ? "#000000" : "#1a1a1a",
-        backgroundImage: backgroundImageUrl
-          ? `url("${backgroundImageUrl}")`
-          : undefined,
-        backgroundSize: backgroundImageUrl ? "cover" : undefined,
-        backgroundPosition: backgroundImageUrl ? "center center" : undefined,
-        backgroundRepeat: backgroundImageUrl ? "no-repeat" : undefined,
+        backgroundColor: "#1a1a1a",
         overflow: "hidden",
       }}
     >
+      {backgroundImageUrl ? (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100%",
+            height: "100%",
+            backgroundImage: `url("${backgroundImageUrl}")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+      ) : null}
       <div
         style={{
           position: "absolute",
-          inset: "0",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: "100%",
+          height: "100%",
           backgroundColor: `rgba(0, 0, 0, ${overlayAlpha})`,
+          zIndex: 1,
         }}
       />
       <div
@@ -140,12 +157,12 @@ export function createOgImageResponse(
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          zIndex: 1,
+          zIndex: 2,
           width: "100%",
           height: "100%",
-        paddingTop: `${gridResult.paddingValues.top}px`,
-        paddingBottom: `${gridResult.paddingValues.bottom}px`,
-      }}
+          paddingTop: `${gridResult.paddingValues.top}px`,
+          paddingBottom: `${gridResult.paddingValues.bottom}px`,
+        }}
       >
         {renderOgElement(gridResult.grid)}
       </div>
