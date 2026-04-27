@@ -122,7 +122,9 @@ export function createOgImageResponse(
       }}
     >
       {backgroundImageUrl ? (
-        <div
+        <img
+          src={backgroundImageUrl}
+          alt=""
           style={{
             position: "absolute",
             top: 0,
@@ -131,10 +133,8 @@ export function createOgImageResponse(
             bottom: 0,
             width: "100%",
             height: "100%",
-            backgroundImage: `url("${backgroundImageUrl}")`,
-            backgroundSize: "cover",
-            backgroundPosition: "center center",
-            backgroundRepeat: "no-repeat",
+            objectFit: "cover",
+            objectPosition: "center",
           }}
         />
       ) : null}
