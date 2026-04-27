@@ -114,6 +114,7 @@ export function createOgImageResponse(
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        position: "relative",
         width: "100%",
         height: "100%",
         backgroundColor: backgroundImageUrl ? "#000000" : "#1a1a1a",
@@ -121,20 +122,30 @@ export function createOgImageResponse(
           ? `url("${backgroundImageUrl}")`
           : undefined,
         backgroundSize: backgroundImageUrl ? "cover" : undefined,
-        backgroundPosition: backgroundImageUrl ? "center" : undefined,
-        paddingTop: `${gridResult.paddingValues.top}px`,
-        paddingBottom: `${gridResult.paddingValues.bottom}px`,
+        backgroundPosition: backgroundImageUrl ? "center center" : undefined,
+        backgroundRepeat: backgroundImageUrl ? "no-repeat" : undefined,
+        overflow: "hidden",
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          inset: "0",
+          backgroundColor: `rgba(0, 0, 0, ${overlayAlpha})`,
+        }}
+      />
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          position: "relative",
+          zIndex: 1,
           width: "100%",
           height: "100%",
-          backgroundColor: `rgba(0, 0, 0, ${overlayAlpha})`,
-        }}
+        paddingTop: `${gridResult.paddingValues.top}px`,
+        paddingBottom: `${gridResult.paddingValues.bottom}px`,
+      }}
       >
         {renderOgElement(gridResult.grid)}
       </div>
