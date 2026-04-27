@@ -6,6 +6,7 @@ import {
   type NepaliDate,
   NEPALI_MONTHS,
 } from "./date_helper";
+import type { OgTextOptions } from "./og_image";
 
 function getLastDayOfNepaliMonth(year: number, month: number): number {
   try {
@@ -62,6 +63,7 @@ export function generateDotsGridJSON(
   currentNepaliDate: NepaliDate,
   screenWidth: number,
   screenHeight: number,
+  textOptions?: OgTextOptions,
 ) {
   const { totalDays, currentDay, remainingDays } = progress;
 
@@ -168,6 +170,35 @@ export function generateDotsGridJSON(
     },
   };
 
+  const handleText = textOptions?.handleText;
+  const handleTextNode = handleText
+    ? {
+        type: "div",
+        props: {
+          style: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: "8px",
+            width: "100%",
+          },
+          children: {
+            type: "text",
+            props: {
+              style: {
+                color: "gray",
+                fontSize: `${fontSize}px`,
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                fontWeight: "500",
+                textAlign: "center",
+              },
+              children: handleText,
+            },
+          },
+        },
+      }
+    : null;
+
   return {
     grid: {
       type: "div",
@@ -196,6 +227,7 @@ export function generateDotsGridJSON(
           },
           dateText,
           progressText,
+          handleTextNode,
         ],
       },
     },
@@ -211,6 +243,7 @@ export function generateMonthsGridJSON(
   currentNepaliDate: NepaliDate,
   screenWidth: number,
   screenHeight: number,
+  textOptions?: OgTextOptions,
 ) {
   const { totalDays, remainingDays, currentDay } = progress;
 
@@ -403,6 +436,35 @@ export function generateMonthsGridJSON(
     },
   };
 
+  const handleText = textOptions?.handleText;
+  const handleTextNode = handleText
+    ? {
+        type: "div",
+        props: {
+          style: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: "8px",
+            width: "100%",
+          },
+          children: {
+            type: "text",
+            props: {
+              style: {
+                color: "gray",
+                fontSize: `${fontSize}px`,
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                fontWeight: "500",
+                textAlign: "center",
+              },
+              children: handleText,
+            },
+          },
+        },
+      }
+    : null;
+
   return {
     grid: {
       type: "div",
@@ -432,6 +494,7 @@ export function generateMonthsGridJSON(
           },
           dateText,
           progressText,
+          handleTextNode,
         ],
       },
     },
@@ -446,6 +509,7 @@ export function generateCurrentMonthGridJSON(
   currentNepaliDate: NepaliDate,
   screenWidth: number,
   screenHeight: number,
+  textOptions?: OgTextOptions,
 ) {
   const topPadding = Math.round((screenHeight * 34) / 100);
   const bottomPadding = Math.round((screenHeight * 20) / 100);
@@ -566,6 +630,35 @@ export function generateCurrentMonthGridJSON(
     },
   };
 
+  const handleText = textOptions?.handleText;
+  const handleTextNode = handleText
+    ? {
+        type: "div",
+        props: {
+          style: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: "8px",
+            width: "100%",
+          },
+          children: {
+            type: "text",
+            props: {
+              style: {
+                color: "gray",
+                fontSize: `${textFontSize}px`,
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                fontWeight: "500",
+                textAlign: "center",
+              },
+              children: handleText,
+            },
+          },
+        },
+      }
+    : null;
+
   return {
     grid: {
       type: "div",
@@ -594,6 +687,7 @@ export function generateCurrentMonthGridJSON(
           },
           dateText,
           progressText,
+          handleTextNode,
         ],
       },
     },
